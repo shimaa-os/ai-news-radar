@@ -612,12 +612,20 @@
     /* Telemetry Data Strip */
     .telemetry-strip {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       background: #09090b;
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       overflow: hidden;
       margin-bottom: 2.5rem;
+    }
+
+    .spin-slow {
+      animation: spinSlow 8s linear infinite;
+    }
+
+    @keyframes spinSlow {
+      100% { transform: rotate(360deg); }
     }
 
     .telemetry-item {
@@ -1505,14 +1513,16 @@
       .telemetry-strip {
         grid-template-columns: repeat(2, 1fr);
       }
-      .telemetry-item:nth-child(2) {
+      .telemetry-item {
+        border-right: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .telemetry-item:nth-child(2n) {
         border-right: none;
       }
-      .telemetry-item:nth-child(3) {
-        border-top: 1px solid var(--border-subtle);
-      }
-      .telemetry-item:nth-child(4) {
-        border-top: 1px solid var(--border-subtle);
+      .telemetry-item:last-child {
+        grid-column: span 2;
+        border-bottom: none;
       }
       .feed-container.grid-view {
         grid-template-columns: 1fr;
@@ -1598,6 +1608,8 @@
               <path d="M12 2.6C12.55 2.6 12.88 3.15 13.08 4.7c.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22C11.12 3.15 11.45 2.6 12 2.6Z"/>
             </svg>
             <span>Continuous Frontier AI Radar</span>
+            <span style="opacity: 0.35; margin: 0 4px;">•</span>
+            <span style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-size: 0.73rem;">Next Sync: <span id="heroBadgeTimer">--:--</span></span>
           </div>
 
           <!-- H1 two masked lines -->
@@ -1645,7 +1657,7 @@
             <rect x="2.4" y="2.4" width="19.2" height="19.2" rx="6.2" fill="#ffffff"/>
             <path d="M12 7.1v7.4M8.15 12.35L12 16.2l3.85-3.85" stroke="#111111" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span>24/7 automated cloud pipeline</span>
+          <span>Cloud Sync in <strong id="heroStatTimer" style="color: #38bdf8; font-family: 'JetBrains Mono', monospace; font-weight: 600;">--m --s</strong></span>
         </div>
 
         <!-- Stat 3: 6 frontier domain sectors -->
@@ -1709,6 +1721,18 @@
             <span class="telemetry-value">
               <span class="telemetry-status-pill">
                 <span class="live-dot"></span> Active 24/7
+              </span>
+            </span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label">
+              <i data-lucide="timer" style="width: 12px; height: 12px;"></i>
+              <span>Next Cloud Sync</span>
+            </span>
+            <span class="telemetry-value">
+              <span class="telemetry-status-pill" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08);">
+                <i data-lucide="refresh-cw" class="spin-slow" style="width: 11px; height: 11px; color: #38bdf8;"></i>
+                <span id="nextSyncCountdown">in --m --s</span>
               </span>
             </span>
           </div>
@@ -2379,11 +2403,32 @@
       });
     })();
 
+    // Live Next-Sync Hourly Countdown (GitHub Actions runs hourly at :00 UTC)
+    function updateNextSyncCountdown() {
+      const now = new Date();
+      const m = 59 - now.getUTCMinutes();
+      const s = 59 - now.getUTCSeconds();
+      const formatted = `${m}m ${String(s).padStart(2, "0")}s`;
+      const shortTime = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+      const el = document.getElementById("nextSyncCountdown");
+      if (el) el.textContent = `in ${formatted}`;
+
+      const badgeEl = document.getElementById("heroBadgeTimer");
+      if (badgeEl) badgeEl.textContent = shortTime;
+
+      const statEl = document.getElementById("heroStatTimer");
+      if (statEl) statEl.textContent = formatted;
+    }
+    setInterval(updateNextSyncCountdown, 1000);
+    updateNextSyncCountdown();
+
     // Initialize application immediately and reliably
     function initApp() {
       safeCreateIcons();
       updateBadges(true);
       renderFeed();
+      updateNextSyncCountdown();
 
       // Ensure hero video autoplays safely or fallback image stays
       const heroVid = document.querySelector('.hero-photo video');

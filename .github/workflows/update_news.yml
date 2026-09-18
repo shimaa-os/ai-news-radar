@@ -1,4 +1,4 @@
-﻿name: ⚡ Auto-Update AI News Feed
+name: ⚡ Auto-Update AI News Feed
 
 on:
   schedule:
@@ -32,10 +32,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Check if index.html changed
-          if ! git diff --quiet index.html; then
+          # Check if index.html or radar.html changed
+          if ! git diff --quiet index.html radar.html; then
             echo "Changes detected, committing and pushing..."
-            git add index.html
+            git add index.html radar.html
             git commit -m "Auto-update AI news feed [skip ci]"
             git push
           else

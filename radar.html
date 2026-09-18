@@ -275,11 +275,19 @@
     /* Telemetry Data Strip (Editorial Counter Strip) */
     .telemetry-strip {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       background: #09090b;
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       overflow: hidden;
+    }
+
+    .spin-slow {
+      animation: spinSlow 8s linear infinite;
+    }
+
+    @keyframes spinSlow {
+      100% { transform: rotate(360deg); }
     }
 
     .telemetry-item {
@@ -898,14 +906,16 @@
       .telemetry-strip {
         grid-template-columns: repeat(2, 1fr);
       }
-      .telemetry-item:nth-child(2) {
+      .telemetry-item {
+        border-right: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .telemetry-item:nth-child(2n) {
         border-right: none;
       }
-      .telemetry-item:nth-child(3) {
-        border-top: 1px solid var(--border-subtle);
-      }
-      .telemetry-item:nth-child(4) {
-        border-top: 1px solid var(--border-subtle);
+      .telemetry-item:last-child {
+        grid-column: span 2;
+        border-bottom: none;
       }
       .feed-container.grid-view {
         grid-template-columns: 1fr;
@@ -942,6 +952,8 @@
         <div class="telemetry-badge">
           <span class="live-dot"></span>
           <span id="liveClock">Loading telemetry...</span>
+          <span style="opacity: 0.35; margin: 0 4px;">•</span>
+          <span style="color: #38bdf8;">Next Sync: <strong id="navCountdown" style="font-family: 'JetBrains Mono', monospace;">--:--</strong></span>
         </div>
 
         <a href="https://github.com/shimaa-os/ai-news-radar" target="_blank" rel="noopener noreferrer" class="github-btn">
@@ -998,6 +1010,18 @@
           <span class="telemetry-value">
             <span class="telemetry-status-pill">
               <span class="live-dot"></span> Active 24/7
+            </span>
+          </span>
+        </div>
+        <div class="telemetry-item">
+          <span class="telemetry-label">
+            <i data-lucide="timer" style="width: 12px; height: 12px;"></i>
+            <span>Next Cloud Sync</span>
+          </span>
+          <span class="telemetry-value">
+            <span class="telemetry-status-pill" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08);">
+              <i data-lucide="refresh-cw" class="spin-slow" style="width: 11px; height: 11px; color: #38bdf8;"></i>
+              <span id="nextSyncCountdown">in --m --s</span>
             </span>
           </span>
         </div>
@@ -1194,6 +1218,17 @@
       function pad(n) { return String(n).padStart(2, "0"); }
       const timeStr = now.getUTCFullYear() + '-' + pad(now.getUTCMonth() + 1) + '-' + pad(now.getUTCDate()) + ' ' + pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes()) + ':' + pad(now.getUTCSeconds()) + ' UTC';
       if (liveClock) liveClock.textContent = timeStr;
+
+      const m = 59 - now.getUTCMinutes();
+      const s = 59 - now.getUTCSeconds();
+      const formatted = `${m}m ${pad(s)}s`;
+      const shortTime = `${pad(m)}:${pad(s)}`;
+
+      const syncEl = document.getElementById("nextSyncCountdown");
+      if (syncEl) syncEl.textContent = `in ${formatted}`;
+
+      const navEl = document.getElementById("navCountdown");
+      if (navEl) navEl.textContent = shortTime;
     }
     setInterval(updateClock, 1000);
     updateClock();
