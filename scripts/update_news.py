@@ -145,12 +145,18 @@ def update_index_html():
     combined = combined[:65]
 
     updated_json_str = json.dumps(combined, ensure_ascii=False)
-    updated_html = html[:match.start(1)] + updated_json_str + html[match.end(1):]
-
-    with open(index_path, "w", encoding="utf-8") as f:
-        f.write(updated_html)
-
-    print(f"Successfully updated {index_path} with {len(new_stories)} new stories! Total now: {len(combined)}")
+    for p in target_paths:
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                c = f.read()
+            m = re.search(r"const STORIES_DATA\s*=\s*(\[.*?\]);", c, re.DOTALL)
+            if m:
+                new_c = c[:m.start(1)] + updated_json_str + c[m.end(1):]
+                with open(p, "w", encoding="utf-8") as f:
+                    f.write(new_c)
+                print(f"Successfully updated {p} with {len(new_stories)} new stories!")
+        except Exception as err:
+            print(f"Error updating {p}: {err}")
 
 if __name__ == "__main__":
     update_index_html()
