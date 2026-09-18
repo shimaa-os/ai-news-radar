@@ -1316,10 +1316,10 @@
                 '</span>' +
               '</div>' +
               '<div class="card-actions-strip">' +
-                '<button class="action-icon-btn ' + bookmarkClass + '" title="' + bookmarkTitle + '" onclick="toggleBookmark('' + item.id + '', event)">' +
+                '<button type="button" class="action-icon-btn btn-bookmark ' + bookmarkClass + '" title="' + bookmarkTitle + '" data-id="' + item.id + '">' +
                   '<i data-lucide="bookmark" style="width: 14px; height: 14px;"></i>' +
                 '</button>' +
-                '<button class="action-icon-btn" title="Copy Article URL" onclick="copyStoryLink('' + item.url + '', event)">' +
+                '<button type="button" class="action-icon-btn btn-copy" title="Copy Article URL" data-url="' + item.url + '">' +
                   '<i data-lucide="copy" style="width: 14px; height: 14px;"></i>' +
                 '</button>' +
               '</div>' +
@@ -1353,6 +1353,24 @@
           { opacity: 1, y: 0, stagger: 0.02, duration: 0.35, ease: "power2.out", clearProps: "all" }
         );
       }
+    }
+
+        // Event delegation on newsFeed for buttons
+    if (feed) {
+      feed.addEventListener("click", function(e) {
+        const bBtn = e.target.closest(".btn-bookmark");
+        if (bBtn) {
+          e.preventDefault(); e.stopPropagation();
+          window.toggleBookmark(bBtn.getAttribute("data-id"), e);
+          return;
+        }
+        const cBtn = e.target.closest(".btn-copy");
+        if (cBtn) {
+          e.preventDefault(); e.stopPropagation();
+          window.copyStoryLink(cBtn.getAttribute("data-url"), e);
+          return;
+        }
+      });
     }
 
     window.toggleBookmark = function(id, event) {
