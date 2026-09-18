@@ -1,4 +1,4 @@
-﻿# ⚡ AI News Radar
+# ⚡ AI News Radar
 
 An automated, live, dark-themed AI intelligence feed that curates breaking artificial intelligence headlines, research breakthroughs, robotics updates, and policy announcements.
 
@@ -27,5 +27,3 @@ Your live feed is hosted and running directly on GitHub Pages:
 - Native anchor card linking (no fragile script navigation)
 - Google Fonts (`Inter`)
 
----
-*Created with paired AI assistance.*
