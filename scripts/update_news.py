@@ -1,4 +1,4 @@
-﻿import json, re, urllib.request, xml.etree.ElementTree as ET
+import os, json, re, urllib.request, xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 
 FEEDS = [
@@ -18,17 +18,17 @@ def clean_html(raw_html):
 def classify_category(text):
     t = text.lower()
     if any(k in t for k in ["robot", "humanoid", "hardware", "chip", "npu", "silicon", "sensor", "wearable", "glasses", "device", "semiconductor"]):
-        return "Robotics & Hardware", "🦾", "cyan"
+        return "Robotics & Hardware", "bot", "cyan"
     elif any(k in t for k in ["security", "hack", "cyber", "vulnerability", "malware", "zero-day", "defense", "recovery", "threat"]):
-        return "Cybersecurity", "🛡️", "rose"
+        return "Cybersecurity", "shield-check", "rose"
     elif any(k in t for k in ["policy", "law", "act", "regulation", "bill", "congress", "senate", "eu ai act", "penalties", "court", "fda", "copyright", "governance"]):
-        return "Policy & Governance", "📜", "amber"
+        return "Policy & Governance", "file-text", "amber"
     elif any(k in t for k in ["energy", "nuclear", "grid", "power", "datacenter", "data center", "infrastructure", "100mw", "cooling"]):
-        return "Infrastructure & Energy", "⚡", "emerald"
+        return "Infrastructure & Energy", "zap", "emerald"
     elif any(k in t for k in ["research", "science", "genome", "biology", "math", "proof", "climate", "lunar", "quantum", "weather", "arxiv", "paper"]):
-        return "Science & Research", "🔬", "indigo"
+        return "Science & Research", "flask-conical", "indigo"
     else:
-        return "Frontier Models", "🧠", "purple"
+        return "Frontier Models", "cpu", "purple"
 
 def fetch_feed(feed_name, url):
     items = []
@@ -78,19 +78,29 @@ def fetch_feed(feed_name, url):
     return items
 
 def update_index_html():
-    index_path = "index.html"
-    try:
-        with open(index_path, "r", encoding="utf-8") as f:
-            html = f.read()
-    except Exception as e:
-        print(f"Error reading index.html: {e}")
-        return
+    target_paths = [p for p in ["radar.html", "index.html"] if os.path.exists(p)]
+    html = None
+    chosen_path = None
+    match = None
 
-    # Extract existing STORIES_DATA
-    match = re.search(r"const STORIES_DATA\s*=\s*(\[.*?\]);", html, re.DOTALL)
+    for p in target_paths:
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                content = f.read()
+            m = re.search(r"const STORIES_DATA\s*=\s*(\[.*?\]);", content, re.DOTALL)
+            if m:
+                html = content
+                chosen_path = p
+                match = m
+                break
+        except Exception as e:
+            continue
+
     if not match:
-        print("Could not find STORIES_DATA in index.html")
+        print("Could not find STORIES_DATA in any target HTML file")
         return
+    
+    index_path = chosen_path
         
     try:
         existing_stories = json.loads(match.group(1))
@@ -140,7 +150,7 @@ def update_index_html():
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(updated_html)
 
-    print(f"Successfully updated index.html with {len(new_stories)} new stories! Total now: {len(combined)}")
+    print(f"Successfully updated {index_path} with {len(new_stories)} new stories! Total now: {len(combined)}")
 
 if __name__ == "__main__":
     update_index_html()
