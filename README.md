@@ -19,6 +19,16 @@ An advanced, real-time artificial intelligence intelligence feed tracking fronti
 
 ---
 
+## 🤖 Automated 24/7 Cloud Pipeline
+
+This repository is self-updating via GitHub Actions (`.github/workflows/update_news.yml`):
+- **Continuous Schedule:** Runs automatically every hour in the GitHub cloud (no local machine or servers required).
+- **Multi-Source Aggregator:** Fetches fresh breaking news from Google News AI, TechCrunch AI, The Verge AI, and Ars Technica.
+- **Intelligent Classification:** Automatically deduplicates, tags, and classifies new stories into 6 domain sectors.
+- **Auto-Deployment:** Commits and pushes fresh news directly to `main`, triggering instantaneous GitHub Pages publishing.
+
+---
+
 ## 🚀 Getting Started
 
 ### Local Viewing
@@ -43,6 +53,7 @@ The project is hosted live on GitHub Pages:
 ## 🛠️ Architecture
 - **HTML5 & CSS3:** CSS Custom Properties, Flexbox, CSS Grid, Glassmorphism backdrop-filter, CSS Keyframe Animations.
 - **Vanilla JavaScript:** High-performance DOM manipulation, search debounce/filtering, state management, and `localStorage` persistence.
+- **Automated Pipeline:** Python 3.11 with standard libraries (`urllib`, `xml.etree.ElementTree`, `re`, `json`).
 - **Typography:** Google Fonts (`Inter` & `JetBrains Mono`).
 
 ---

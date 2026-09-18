@@ -1,0 +1,43 @@
+﻿name: ⚡ Auto-Update AI News Feed
+
+on:
+  schedule:
+    # Runs every hour at minute 0 (24/7 in the cloud)
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    # Allows manual trigger anytime from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update-feed:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📡 Fetch Latest AI News
+        run: |
+          python scripts/update_news.py
+
+      - name: 🚀 Commit and Push Updates
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check if index.html changed
+          if ! git diff --quiet index.html; then
+            echo "Changes detected, committing and pushing..."
+            git add index.html
+            git commit -m "Auto-update AI news feed [skip ci]"
+            git push
+          else
+            echo "No new updates found at this time."
+          fi
